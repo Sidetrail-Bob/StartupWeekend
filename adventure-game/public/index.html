@@ -21,7 +21,7 @@
 <body>
 
     <!-- 1. SETUP SCREEN -->
-    <div id="setup-panel" class="screen active">
+    <div id="setup-panel" class="screen hidden">
         <div class="panel-card">
             <h1>Start Adventure</h1>
             <div class="config-group">
@@ -37,7 +37,7 @@
     </div>
 
     <!-- 2. GAME SCREEN -->
-    <div id="game-container" class="screen hidden">
+    <div id="game-container" class="screen">
         <canvas id="map-canvas"></canvas>
 
         <!-- Character Sprite (CSS Representation) -->
@@ -48,6 +48,9 @@
             <div class="hud-item">Stars: <span id="score-display">0</span></div>
             <div class="hud-item">Level 1</div>
         </div>
+
+        <!-- Start Button on Canvas -->
+        <button id="canvas-start-btn" class="canvas-start-btn">START</button>
 
         <!-- Feedback Message Overlay -->
         <div id="feedback-msg" class="hidden"></div>

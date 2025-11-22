@@ -4,8 +4,22 @@ const Game = {
     currentNodeFailures: 0,
 
     init: async () => {
+        console.log('Game.init starting...');
+
         // 1. Setup Event Listeners FIRST (before any async operations)
-        document.getElementById('btn-start').addEventListener('click', Game.startGame);
+        const btnStart = document.getElementById('btn-start');
+        if (btnStart) {
+            btnStart.addEventListener('click', Game.startGame);
+        }
+
+        // Canvas start button - skip setup and go directly to game
+        const canvasStartBtn = document.getElementById('canvas-start-btn');
+        if (canvasStartBtn) {
+            console.log('Found canvas-start-btn, adding listener');
+            canvasStartBtn.addEventListener('click', Game.onCanvasStart);
+        } else {
+            console.error('canvas-start-btn not found!');
+        }
 
         // Listen for Map clicks
         window.addEventListener('node-clicked', (e) => {
@@ -18,8 +32,60 @@ const Game = {
             UIManager.populateConfig(Game.manifest);
         } catch (err) {
             console.error('Failed to load manifest:', err);
-            alert('Failed to connect to server. Is it running on port 3000?');
         }
+
+        console.log('Game.init complete');
+    },
+
+    onCanvasStart: async () => {
+        console.log('START button clicked!');
+
+        // Hide the canvas start button
+        document.getElementById('canvas-start-btn').classList.add('hidden');
+
+        // Use defaults if manifest failed to load
+        const themeId = Game.manifest?.themes?.[0]?.id || 'forest';
+        const charId = Game.manifest?.characters?.[0]?.id || 'hero_boy';
+        console.log('Using theme:', themeId, 'char:', charId);
+
+        try {
+            // Create Session on Server
+            Game.session = await API.startSession('Player', charId, themeId);
+            console.log('Session created:', Game.session);
+        } catch (err) {
+            console.error('Failed to start session:', err);
+            // Create a local session if server is down
+            Game.session = {
+                sessionId: 'local-' + Date.now(),
+                currentNode: 0,
+                currentLevel: 1,
+                totalStars: 0,
+                characterId: charId,
+                mercyMode: false
+            };
+            console.log('Using local session:', Game.session);
+        }
+
+        // Apply theme background
+        const gameContainer = document.getElementById('game-container');
+        gameContainer.style.backgroundImage = `url('assets/themes/${themeId}_bg.svg')`;
+        gameContainer.style.backgroundSize = 'cover';
+        gameContainer.style.backgroundPosition = 'center';
+
+        // Initialize and render map
+        console.log('Initializing map...');
+        MapRenderer.init('map-canvas');
+        const themeType = Game.manifest?.themes?.find(t => t.id === themeId)?.type || 'winding';
+        MapRenderer.generateNodes(themeType);
+
+        // Place Character at Start
+        const startNode = MapRenderer.getNodePos(0);
+        console.log('Start node:', startNode);
+        UIManager.moveCharacter(startNode.x, startNode.y, charId);
+
+        // Intro Message
+        UIManager.showFeedback("Let's Go!");
+        console.log('Game started!');
     },
 
     startGame: async () => {
@@ -52,9 +118,14 @@ const Game = {
     },
 
     handleNodeClick: (nodeId) => {
+        console.log('handleNodeClick called with nodeId:', nodeId, 'currentNode:', Game.session?.currentNode);
         // Rule: Can only click the CURRENT node (the active challenge)
-        if (nodeId !== Game.session.currentNode) return;
+        if (nodeId !== Game.session.currentNode) {
+            console.log('Node not current, ignoring');
+            return;
+        }
 
+        console.log('Launching challenge!');
         Game.launchChallenge();
     },
 

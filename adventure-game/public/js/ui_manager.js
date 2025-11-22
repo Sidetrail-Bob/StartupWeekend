@@ -31,9 +31,9 @@ const UIManager = {
         sprite.style.backgroundImage = `url('assets/characters/${charId}.svg')`;
         sprite.style.backgroundSize = 'cover';
         sprite.style.backgroundColor = 'transparent';
-        // Center sprite on node (assuming 50px width)
-        sprite.style.left = (x - 25) + 'px';
-        sprite.style.top = (y - 25) + 'px';
+        // Center sprite on node (150px width)
+        sprite.style.left = (x - 75) + 'px';
+        sprite.style.top = (y - 75) + 'px';
     },
 
     openModal: (title) => {

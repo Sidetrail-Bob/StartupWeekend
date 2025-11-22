@@ -59,7 +59,7 @@ select {
 
 /* Game Map */
 #game-container {
-    
+    background: linear-gradient(180deg, #1a2a3a 0%, #2c3e50 100%);
 }
 canvas {
     display: block;
@@ -69,8 +69,8 @@ canvas {
 
 #character-sprite {
     position: absolute;
-    width: 50px;
-    height: 50px;
+    width: 150px;
+    height: 150px;
     background: transparent;
     background-size: contain;
     background-repeat: no-repeat;
@@ -78,6 +78,7 @@ canvas {
     transition: all 1s ease-in-out; /* Smooth movement */
     z-index: 10;
     display: none;
+    pointer-events: none; /* Allow clicks to pass through */
 }
 
 #ui-hud {
@@ -173,4 +174,32 @@ canvas {
     font-weight: bold;
     color: #2c3e50;
     margin-bottom: 30px;
+}
+
+/* Canvas Start Button */
+.canvas-start-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, #27ae60, #2ecc71);
+    color: white;
+    border: none;
+    padding: 30px 80px;
+    font-size: 36px;
+    font-weight: bold;
+    border-radius: 60px;
+    cursor: pointer;
+    z-index: 50;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+.canvas-start-btn:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+}
+.canvas-start-btn.hidden {
+    display: none;
 }

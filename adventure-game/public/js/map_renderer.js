@@ -4,6 +4,7 @@ const MapRenderer = {
     nodes: [],
     width: 0,
     height: 0,
+    animationId: null,
 
     init: function(canvasId) {
         this.canvas = document.getElementById(canvasId);
@@ -16,11 +17,13 @@ const MapRenderer = {
             const rect = this.canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
+            console.log('Canvas clicked at:', x, y);
 
             this.nodes.forEach(node => {
                 // Simple Distance check (30px radius)
                 const dist = Math.sqrt((x - node.x)**2 + (y - node.y)**2);
                 if (dist < 30) {
+                    console.log('Node clicked:', node.id);
                     // Dispatch event for Main.js to hear
                     window.dispatchEvent(new CustomEvent('node-clicked', { detail: { nodeId: node.id } }));
                 }
@@ -57,7 +60,7 @@ const MapRenderer = {
 
             this.nodes.push({ id: i, x, y, status: i === 0 ? 'current' : 'locked' });
         }
-        this.draw();
+        this.startAnimation();
     },
 
     draw: function() {
@@ -81,6 +84,15 @@ const MapRenderer = {
 
         // Draw Nodes
         this.nodes.forEach(node => {
+            // Draw pulsing glow for current node
+            if (node.status === 'current') {
+                const pulse = Math.sin(Date.now() / 200) * 0.3 + 0.7;
+                this.ctx.beginPath();
+                this.ctx.arc(node.x, node.y, 40, 0, Math.PI*2);
+                this.ctx.fillStyle = `rgba(241, 196, 15, ${pulse * 0.5})`;
+                this.ctx.fill();
+            }
+
             this.ctx.beginPath();
             this.ctx.arc(node.x, node.y, 25, 0, Math.PI*2);
 
@@ -99,7 +111,22 @@ const MapRenderer = {
             this.ctx.textAlign = 'center';
             this.ctx.textBaseline = 'middle';
             this.ctx.fillText(node.id + 1, node.x, node.y);
+
+            // Draw "TAP!" hint for current node
+            if (node.status === 'current') {
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = 'bold 14px Arial';
+                this.ctx.fillText('TAP!', node.x, node.y + 45);
+            }
         });
+    },
+
+    startAnimation: function() {
+        const animate = () => {
+            this.draw();
+            this.animationId = requestAnimationFrame(animate);
+        };
+        animate();
     },
 
     updateNodeStatus: function(nodeId, status) {
