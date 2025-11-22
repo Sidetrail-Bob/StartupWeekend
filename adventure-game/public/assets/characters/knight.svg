@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Body/Armor -->
+  <ellipse cx="50" cy="72" rx="22" ry="24" fill="#708090"/>
+  <!-- Helmet -->
+  <path d="M 25 45 Q 25 15 50 10 Q 75 15 75 45 L 75 55 L 25 55 Z" fill="#708090"/>
+  <!-- Helmet Visor -->
+  <rect x="30" y="35" width="40" height="18" rx="3" fill="#2F4F4F"/>
+  <!-- Eye Slits -->
+  <rect x="35" y="40" width="12" height="4" fill="#1a1a1a"/>
+  <rect x="53" y="40" width="12" height="4" fill="#1a1a1a"/>
+  <!-- Helmet Plume -->
+  <ellipse cx="50" cy="8" rx="8" ry="6" fill="#e74c3c"/>
+  <ellipse cx="50" cy="5" rx="5" ry="4" fill="#c0392b"/>
+  <!-- Shield -->
+  <path d="M 72 55 L 85 55 L 85 75 Q 78 85 72 75 Z" fill="#3498db"/>
+  <path d="M 75 58 L 82 58 L 82 72 Q 78 78 75 72 Z" fill="#2980b9"/>
+  <!-- Sword handle visible -->
+  <rect x="15" y="50" width="4" height="15" fill="#8B4513"/>
+  <rect x="12" y="48" width="10" height="4" fill="#FFD700"/>
+</svg>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adventure Map Game</title>
+    <link rel="stylesheet" href="css/style.css?v=2">
+    <style>
+        /* Embedded fallback styles */
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: Verdana, sans-serif; background: #333; }
+        .screen { position: absolute; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        .screen.hidden { display: none !important; }
+        #setup-panel { background: #2c3e50; }
+        .panel-card { background: white; padding: 40px; border-radius: 20px; text-align: center; width: 300px; }
+        .config-group { margin: 20px 0; text-align: left; }
+        select { width: 100%; padding: 10px; font-size: 16px; margin-top: 5px; }
+        .btn-primary { background: #27ae60; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; width: 100%; }
+        .btn-primary:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body>
+
+    <!-- 1. SETUP SCREEN -->
+    <div id="setup-panel" class="screen active">
+        <div class="panel-card">
+            <h1>Start Adventure</h1>
+            <div class="config-group">
+                <label>Map Theme:</label>
+                <select id="config-theme"></select>
+            </div>
+            <div class="config-group">
+                <label>Your Hero:</label>
+                <select id="config-char"></select>
+            </div>
+            <button id="btn-start" class="btn-primary">Let's Go!</button>
+        </div>
+    </div>
+
+    <!-- 2. GAME SCREEN -->
+    <div id="game-container" class="screen hidden">
+        <canvas id="map-canvas"></canvas>
+
+        <!-- Character Sprite (CSS Representation) -->
+        <div id="character-sprite"></div>
+
+        <!-- UI HUD -->
+        <div id="ui-hud">
+            <div class="hud-item">Stars: <span id="score-display">0</span></div>
+            <div class="hud-item">Level 1</div>
+        </div>
+
+        <!-- Feedback Message Overlay -->
+        <div id="feedback-msg" class="hidden"></div>
+    </div>
+
+    <!-- 3. MINI-GAME MODAL -->
+    <div id="game-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Challenge!</h2>
+            </div>
+            <div id="minigame-container">
+                <!-- Game Injected Here via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="js/api.js"></script>
+    <script src="js/map_renderer.js"></script>
+    <script src="js/ui_manager.js"></script>
+
+    <!-- Pre-load the Math Game -->
+    <script src="js/minigames/game_math_add.js"></script>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
