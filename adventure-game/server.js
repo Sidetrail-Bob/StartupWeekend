@@ -101,6 +101,37 @@ app.post('/api/session/update', (req, res) => {
     res.json({ success: true, state: session });
 });
 
+// 4. Admin: Get All Sessions
+app.get('/api/admin/sessions', (req, res) => {
+    try {
+        const files = fs.readdirSync(SESSIONS_DIR);
+        const sessions = files
+            .filter(f => f.endsWith('.json'))
+            .map(f => {
+                const content = fs.readFileSync(path.join(SESSIONS_DIR, f));
+                return JSON.parse(content);
+            });
+        res.json(sessions);
+    } catch (err) {
+        res.json([]);
+    }
+});
+
+// 5. Admin: Clear All Sessions
+app.delete('/api/admin/sessions', (req, res) => {
+    try {
+        const files = fs.readdirSync(SESSIONS_DIR);
+        files.forEach(f => {
+            if (f.endsWith('.json')) {
+                fs.unlinkSync(path.join(SESSIONS_DIR, f));
+            }
+        });
+        res.json({ success: true, deleted: files.length });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);
 });

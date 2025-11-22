@@ -47,13 +47,36 @@
         <div id="ui-hud">
             <div class="hud-item">Stars: <span id="score-display">0</span></div>
             <div class="hud-item">Level 1</div>
+            <a href="admin.html" class="hud-item hud-link">Admin</a>
         </div>
 
-        <!-- Start Button on Canvas -->
-        <button id="canvas-start-btn" class="canvas-start-btn">START</button>
+        <!-- Start Menu on Canvas -->
+        <div id="canvas-start-menu" class="canvas-start-menu">
+            <h1>Adventure Game</h1>
+            <div class="start-menu-options">
+                <div class="option-group">
+                    <label>Theme:</label>
+                    <select id="canvas-theme-select"></select>
+                </div>
+                <div class="option-group">
+                    <label>Character:</label>
+                    <select id="canvas-char-select"></select>
+                </div>
+            </div>
+            <button id="canvas-start-btn" class="canvas-start-btn">START</button>
+        </div>
 
         <!-- Feedback Message Overlay -->
         <div id="feedback-msg" class="hidden"></div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="victory-screen hidden">
+            <h1>VICTORY!</h1>
+            <div class="victory-stars">
+                <span id="victory-star-count">0</span> Stars Collected!
+            </div>
+            <button id="play-again-btn" class="play-again-btn">Play Again</button>
+        </div>
     </div>
 
     <!-- 3. MINI-GAME MODAL -->
@@ -73,8 +96,10 @@
     <script src="js/map_renderer.js"></script>
     <script src="js/ui_manager.js"></script>
 
-    <!-- Pre-load the Math Game -->
+    <!-- Pre-load Mini-Games -->
     <script src="js/minigames/game_math_add.js"></script>
+    <script src="js/minigames/game_memory.js"></script>
+    <script src="js/minigames/game_pattern.js"></script>
 
     <script src="js/main.js"></script>
 </body>

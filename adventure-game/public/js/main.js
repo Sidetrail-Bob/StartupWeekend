@@ -12,13 +12,19 @@ const Game = {
             btnStart.addEventListener('click', Game.startGame);
         }
 
-        // Canvas start button - skip setup and go directly to game
+        // Canvas start button
         const canvasStartBtn = document.getElementById('canvas-start-btn');
         if (canvasStartBtn) {
             console.log('Found canvas-start-btn, adding listener');
             canvasStartBtn.addEventListener('click', Game.onCanvasStart);
         } else {
             console.error('canvas-start-btn not found!');
+        }
+
+        // Play again button
+        const playAgainBtn = document.getElementById('play-again-btn');
+        if (playAgainBtn) {
+            playAgainBtn.addEventListener('click', Game.playAgain);
         }
 
         // Listen for Map clicks
@@ -30,22 +36,50 @@ const Game = {
         try {
             Game.manifest = await API.getManifest();
             UIManager.populateConfig(Game.manifest);
+            Game.populateCanvasSelects(Game.manifest);
         } catch (err) {
             console.error('Failed to load manifest:', err);
+            // Use defaults if server fails
+            Game.populateCanvasSelects(null);
         }
 
         console.log('Game.init complete');
     },
 
+    populateCanvasSelects: (manifest) => {
+        const themeSelect = document.getElementById('canvas-theme-select');
+        const charSelect = document.getElementById('canvas-char-select');
+
+        if (manifest) {
+            manifest.themes.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t.id;
+                opt.textContent = t.name;
+                themeSelect.appendChild(opt);
+            });
+
+            manifest.characters.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                charSelect.appendChild(opt);
+            });
+        } else {
+            // Fallback defaults
+            themeSelect.innerHTML = '<option value="forest">Whispering Woods</option><option value="space">Galactic Route</option>';
+            charSelect.innerHTML = '<option value="bunny">Fluffy Bunny</option><option value="bear">Friendly Bear</option>';
+        }
+    },
+
     onCanvasStart: async () => {
         console.log('START button clicked!');
 
-        // Hide the canvas start button
-        document.getElementById('canvas-start-btn').classList.add('hidden');
+        // Hide the canvas start menu
+        document.getElementById('canvas-start-menu').classList.add('hidden');
 
-        // Use defaults if manifest failed to load
-        const themeId = Game.manifest?.themes?.[0]?.id || 'forest';
-        const charId = Game.manifest?.characters?.[0]?.id || 'hero_boy';
+        // Get selected values from dropdowns
+        const themeId = document.getElementById('canvas-theme-select').value || 'forest';
+        const charId = document.getElementById('canvas-char-select').value || 'bunny';
         console.log('Using theme:', themeId, 'char:', charId);
 
         try {
@@ -130,16 +164,17 @@ const Game = {
     },
 
     launchChallenge: () => {
-        // In real app: pick game from manifest based on config.
-        // Demo: Always use "math_add"
-        const gameId = 'math_add';
+        // Randomly pick from available games
+        const availableGames = ['math_add', 'memory', 'pattern'];
+        const gameId = availableGames[Math.floor(Math.random() * availableGames.length)];
         const gameModule = window.GameLibrary[gameId];
 
         if (!gameModule) {
-            console.error("Game module not loaded!");
+            console.error("Game module not loaded:", gameId);
             return;
         }
 
+        console.log('Launching game:', gameId);
         UIManager.openModal(gameModule.config.name);
 
         // DIFFICULTY LOGIC
@@ -183,7 +218,8 @@ const Game = {
                 UIManager.moveCharacter(nextPos.x, nextPos.y, Game.session.characterId);
                 UIManager.updateScore(Game.session.totalStars);
             } else {
-                UIManager.showFeedback("VICTORY!", 5000);
+                // VICTORY!
+                Game.showVictory();
             }
 
         } else {
@@ -212,6 +248,35 @@ const Game = {
                 UIManager.showFeedback("Try Again!");
             }
         }
+    },
+
+    showVictory: () => {
+        // Update star count display
+        document.getElementById('victory-star-count').textContent = Game.session.totalStars;
+        // Show victory screen
+        document.getElementById('victory-screen').classList.remove('hidden');
+        // Stop the map animation
+        if (MapRenderer.animationId) {
+            cancelAnimationFrame(MapRenderer.animationId);
+        }
+    },
+
+    playAgain: () => {
+        // Hide victory screen
+        document.getElementById('victory-screen').classList.add('hidden');
+        // Show start menu
+        document.getElementById('canvas-start-menu').classList.remove('hidden');
+        // Hide character
+        document.getElementById('character-sprite').style.display = 'none';
+        // Reset score display
+        document.getElementById('score-display').textContent = '0';
+        // Clear the canvas
+        const canvas = document.getElementById('map-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Reset game state
+        Game.session = null;
+        Game.currentNodeFailures = 0;
     }
 };
 
