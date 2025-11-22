@@ -27,6 +27,12 @@ const Game = {
             playAgainBtn.addEventListener('click', Game.playAgain);
         }
 
+        // Next level button
+        const nextLevelBtn = document.getElementById('next-level-btn');
+        if (nextLevelBtn) {
+            nextLevelBtn.addEventListener('click', Game.nextLevel);
+        }
+
         // Listen for Map clicks
         window.addEventListener('node-clicked', (e) => {
             Game.handleNodeClick(e.detail.nodeId);
@@ -95,6 +101,7 @@ const Game = {
                 currentLevel: 1,
                 totalStars: 0,
                 characterId: charId,
+                themeId: themeId,
                 mercyMode: false
             };
             console.log('Using local session:', Game.session);
@@ -251,8 +258,9 @@ const Game = {
     },
 
     showVictory: () => {
-        // Update star count display
+        // Update displays
         document.getElementById('victory-star-count').textContent = Game.session.totalStars;
+        document.getElementById('victory-level-num').textContent = Game.session.currentLevel;
         // Show victory screen
         document.getElementById('victory-screen').classList.remove('hidden');
         // Stop the map animation
@@ -270,6 +278,7 @@ const Game = {
         document.getElementById('character-sprite').style.display = 'none';
         // Reset score display
         document.getElementById('score-display').textContent = '0';
+        document.getElementById('level-display').textContent = '1';
         // Clear the canvas
         const canvas = document.getElementById('map-canvas');
         const ctx = canvas.getContext('2d');
@@ -277,6 +286,47 @@ const Game = {
         // Reset game state
         Game.session = null;
         Game.currentNodeFailures = 0;
+    },
+
+    nextLevel: () => {
+        // Hide victory screen
+        document.getElementById('victory-screen').classList.add('hidden');
+
+        // Get available themes and cycle to next one
+        const themes = Game.manifest?.themes || [
+            { id: 'forest', type: 'winding' },
+            { id: 'space', type: 'circular' }
+        ];
+        const currentThemeIndex = themes.findIndex(t => t.id === Game.session.themeId);
+        const nextThemeIndex = (currentThemeIndex + 1) % themes.length;
+        const nextTheme = themes[nextThemeIndex];
+
+        // Update session for next level
+        Game.session.currentLevel++;
+        Game.session.currentNode = 0;
+        Game.session.themeId = nextTheme.id;
+        Game.currentNodeFailures = 0;
+
+        // Update HUD
+        document.getElementById('level-display').textContent = Game.session.currentLevel;
+
+        // Apply new theme background
+        const gameContainer = document.getElementById('game-container');
+        gameContainer.style.backgroundImage = `url('assets/themes/${nextTheme.id}_bg.svg')`;
+
+        // Clear and regenerate map
+        MapRenderer.nodes = [];
+        if (MapRenderer.animationId) {
+            cancelAnimationFrame(MapRenderer.animationId);
+        }
+        MapRenderer.generateNodes(nextTheme.type);
+
+        // Move character to start
+        const startNode = MapRenderer.getNodePos(0);
+        UIManager.moveCharacter(startNode.x, startNode.y, Game.session.characterId);
+
+        // Show level start message
+        UIManager.showFeedback(`Level ${Game.session.currentLevel}!`);
     }
 };
 
